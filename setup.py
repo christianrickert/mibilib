@@ -2,6 +2,13 @@
 
 Copyright (C) 2022 Ionpath, Inc.  All rights reserved."""
 
+# Please note that dependencies are managed with the `environment.yml`
+# at the repository level.
+# Enforcing module versions in the `install_requires` parameter that differ
+# from the conda environment will prompt `pip` to interfere with `conda` and
+# try to install these specific module versions into the existing environment:
+# See: https://www.anaconda.com/blog/using-pip-in-a-conda-environment
+
 from setuptools import setup
 
 setup(
