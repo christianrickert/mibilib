@@ -18,9 +18,7 @@ SPECIFIED_METADATA_ATTRIBUTES = ('date', 'run', 'coordinates', 'size', 'slide',
                                  'panel', 'mass_offset', 'mass_gain',
                                  'time_resolution', 'miscalibrated',
                                  'check_reg', 'filename', 'description',
-                                 'version')
-
-
+                                 'version', 'imaging_preset')
 
 APERTURE_1MM = u'A'
 APERTURE_300UM = u'B'
