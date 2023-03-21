@@ -22,6 +22,7 @@ setup(
     python_requires=">=3.11",
     install_requires=[
         "matplotlib",
+        "mock",
         "numpy",
         "pandas",
         "pillow",
