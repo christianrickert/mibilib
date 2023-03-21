@@ -37,7 +37,7 @@ METADATA = {
     'time_resolution': 0.5, 'miscalibrated': False, 'check_reg': False,
     'filename': '20180703_1234_test', 'description': 'test image',
     'version': 'alpha', 'imaging_preset': 'Fine', 'json': '{\"4\":5,\"6\":7}',
-    'lens1_voltage': '21345.6'
+    'lens1_voltage': '21345.6', 'section': 4
 }
 USER_DEFINED_METADATA = {'x_size': 500., 'y_size': 500., 'mass_range': 20}
 OLD_METADATA = {
@@ -284,7 +284,7 @@ class TestWriteReadTiff(unittest.TestCase):
             'date': datetime.datetime.strptime(expected['date'],
                                                '%Y-%m-%dT%H:%M:%S'),
             'description': None, 'version': None, 'imaging_preset': None, 'json': None,
-            'lens1_voltage': None})
+            'lens1_voltage': None, 'section': None})
         self.assertEqual(metadata, expected)
 
     def test_read_old_mibiscope_metadata(self):
@@ -298,7 +298,8 @@ class TestWriteReadTiff(unittest.TestCase):
                                                '%Y-%m-%dT%H:%M:%S'),
             'imaging_preset': None,
             'json': None,
-            'lens1_voltage': None
+            'lens1_voltage': None,
+            'section': None
         })
         self.assertEqual(metadata, expected)
 
@@ -316,6 +317,7 @@ class TestWriteReadTiff(unittest.TestCase):
         del expected['imaging_preset']
         del expected['json']
         del expected['lens1_voltage']
+        del expected['section']
         self.assertEqual(metadata, expected)
 
     def test_convert_from_previous(self):

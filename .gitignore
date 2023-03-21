@@ -97,3 +97,4 @@ ENV/
 .ropeproject
 .pytest_cache/
 *.swp
+bftools.zip

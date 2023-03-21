@@ -19,7 +19,7 @@ SPECIFIED_METADATA_ATTRIBUTES = ('date', 'run', 'coordinates', 'size', 'slide',
                                  'time_resolution', 'miscalibrated',
                                  'check_reg', 'filename', 'description',
                                  'version', 'imaging_preset', 'json',
-                                 'lens1_voltage')
+                                 'lens1_voltage', 'section')
 
 # custom metadata attributes written by `MIBIscope/mibin-commercial`
 HIMSR_METADATA_ATTRIBUTES = ('himsr.author',
