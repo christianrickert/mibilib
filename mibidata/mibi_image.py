@@ -18,7 +18,16 @@ SPECIFIED_METADATA_ATTRIBUTES = ('date', 'run', 'coordinates', 'size', 'slide',
                                  'panel', 'mass_offset', 'mass_gain',
                                  'time_resolution', 'miscalibrated',
                                  'check_reg', 'filename', 'description',
-                                 'version', 'imaging_preset')
+                                 'version', 'imaging_preset', 'json')
+
+# custom metadata attributes written by `MIBIscope/mibin-commercial`
+HIMSR_METADATA_ATTRIBUTES = ('himsr.author',
+                             'himsr.back',
+                             'himsr.bloom',
+                             'himsr.creation',
+                             'himsr.mph',
+                             'himsr.software',
+                             'himsr.window')
 
 APERTURE_1MM = u'A'
 APERTURE_300UM = u'B'

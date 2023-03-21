@@ -151,7 +151,7 @@ def write(filename, image, sed=None, optical=None, ranges=None,
     prefixed_attributes = mi.SPECIFIED_METADATA_ATTRIBUTES[1:]
     description = {}
     for key, value in image.metadata().items():
-        if key in prefixed_attributes:
+        if key in prefixed_attributes or key in mi.HIMSR_METADATA_ATTRIBUTES:
             description[f'mibi.{key}'] = value
         elif key in RESERVED_MIBITIFF_ATTRIBUTES:
             warnings.warn(f'Skipping writing user-defined {key} to the '

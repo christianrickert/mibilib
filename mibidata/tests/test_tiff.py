@@ -36,7 +36,7 @@ METADATA = {
     'panel': '20170916_1x', 'mass_offset': 0.1, 'mass_gain': 0.2,
     'time_resolution': 0.5, 'miscalibrated': False, 'check_reg': False,
     'filename': '20180703_1234_test', 'description': 'test image',
-    'version': 'alpha', 'imaging_preset': 'Fine'
+    'version': 'alpha', 'imaging_preset': 'Fine', 'json': "{\"4\":5,\"6\":7}"
 }
 USER_DEFINED_METADATA = {'x_size': 500., 'y_size': 500., 'mass_range': 20}
 OLD_METADATA = {
@@ -282,7 +282,7 @@ class TestWriteReadTiff(unittest.TestCase):
             'conjugates': list(CHANNELS),
             'date': datetime.datetime.strptime(expected['date'],
                                                '%Y-%m-%dT%H:%M:%S'),
-            'description': None, 'version': None, 'imaging_preset': None})
+            'description': None, 'version': None, 'imaging_preset': None, 'json': None})
         self.assertEqual(metadata, expected)
 
     def test_read_old_mibiscope_metadata(self):
@@ -294,7 +294,8 @@ class TestWriteReadTiff(unittest.TestCase):
             'aperture': 'B',
             'date': datetime.datetime.strptime(expected['date'],
                                                '%Y-%m-%dT%H:%M:%S'),
-            'imaging_preset': None
+            'imaging_preset': None,
+            'json': None
         })
         self.assertEqual(metadata, expected)
 
@@ -310,6 +311,7 @@ class TestWriteReadTiff(unittest.TestCase):
         del expected['description']
         del expected['version']
         del expected['imaging_preset']
+        del expected['json']
         self.assertEqual(metadata, expected)
 
     def test_convert_from_previous(self):
