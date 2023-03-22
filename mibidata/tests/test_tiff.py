@@ -502,7 +502,9 @@ class TestWriteReadTiff(unittest.TestCase):
 
     def test_read_normalize_write(self):
         """Read a multichannel TIFF file, multiply its pixel values by a given factor, and
-           write a multichannel TIFF file with identical metadata but updated pixel values."""
+           write a multichannel TIFF file with identical metadata but updated pixel values.
+           Test will fail when the metadata changes or when the data is not normalized.
+           """
         NRM = 0.1234
         in_file = HIMSR_TIFF_FILE
         out_ext = os.path.splitext(in_file)
