@@ -62,7 +62,7 @@ OLD_MIBISCOPE_METADATA = {
     'description': 'test image',
 }
 OLD_TIFF_FILE = os.path.join(os.path.dirname(__file__), 'data', 'v0.1.tiff')
-
+HIMSR_TIFF_FILE = os.path.join(os.path.dirname(__file__), 'data', '[FOV1-1] MoQC-100.tif')
 
 class TestTiffHelpers(unittest.TestCase):
 
@@ -499,6 +499,29 @@ class TestWriteReadTiff(unittest.TestCase):
             f'\"{bftools_path}\" {self.filename} converted.tiff'), 0)
         self.assertEqual(os.system('rm -rf bftools'), 0)
         self.assertEqual(os.system(f'rm {self.filename} converted.tiff'), 0)
+
+    def test_read_normalize_write(self):
+        """Read a multichannel TIFF file, multiply its pixel values by a given factor, and
+           write a multichannel TIFF file with identical metadata but updated pixel values."""
+        NRM = 0.1234
+        in_file = HIMSR_TIFF_FILE
+        out_ext = os.path.splitext(in_file)
+        out_file = os.path.abspath(out_ext[0] + "_nrm" + out_ext[1])
+        self.assertNotEqual(in_file, out_file)  # don't overwrite input
+        in_image = tiff.read(in_file)
+        in_mean = np.mean(in_image.data)
+        in_image.data *= NRM
+        out_mean = np.mean(in_image.data)
+        out_image = tiff.write(out_file, in_image)
+        self.assertEqual(tiff.info(in_file), tiff.info(out_file),
+                         "Metadata is not identical after normalization.")
+        self.assertNotEqual(format(in_mean, '.3f'), format(out_mean, '.3f'),
+                            "Normalization factor was set to " +
+                            str(format(NRM, '.3f')) +
+                            " but the factor is actually " +
+                            str(format(out_mean/in_mean, '.3f')))
+        if os.path.exists(out_file):
+            os.remove(out_file)
 
 if __name__ == '__main__':
     unittest.main()
