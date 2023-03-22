@@ -35,14 +35,14 @@ REQUIRED_METADATA_ATTRIBUTES = ('fov_id', 'fov_name', 'run', 'folder',
                                 'masses', 'targets')
 
 def _micron_to_cm(arg):
-    """Converts microns (1cm = 1e4 microns) to a fraction tuple in cm."""
+    """Converts µm (1 cm = 10_000 µm) to a fraction tuple in cm."""
     frac = Fraction(float(arg) / _MICRONS_PER_CM).limit_denominator(
         _MAX_DENOMINATOR)
     return frac.numerator, frac.denominator
 
 
 def _cm_to_micron(arg):
-    """Converts cm fraction to microns (1cm = 1e4 microns)."""
+    """Converts cm fraction to µm (1 cm = 10_000 µm)."""
     return float(arg[0]) / float(arg[1]) * _MICRONS_PER_CM
 
 def _page_name_string(target, mass):
@@ -142,8 +142,8 @@ def write(filename, image, sed=None, optical=None, ranges=None,
         (286, '2i', 1, _micron_to_cm(image.coordinates[0])),  # x-position
         (287, '2i', 1, _micron_to_cm(image.coordinates[1])),  # y-position
     ]
-    resolution = (image.data.shape[0] * 1e4 / float(image.size),
-                  image.data.shape[1] * 1e4 / float(image.size),
+    resolution = (image.data.shape[0] * _MICRONS_PER_CM / float(image.size),
+                  image.data.shape[1] * _MICRONS_PER_CM / float(image.size),
                   'CENTIMETER')
 
     # The mibi. prefix is added to attributes defined in the spec.
@@ -192,8 +192,8 @@ def write(filename, image, sed=None, optical=None, ranges=None,
                 if sed.ndim > 2:
                     sed = sed[:, :, 0]
 
-                sed_resolution = (sed.shape[0] * 1e4 / float(image.size),
-                                  sed.shape[1] * 1e4 / float(image.size),
+                sed_resolution = (sed.shape[0] * _MICRONS_PER_CM / float(image.size),
+                                  sed.shape[1] * _MICRONS_PER_CM / float(image.size),
                                   'CENTIMETER')
 
                 page_name = (285, 's', 0, 'SED')
@@ -361,7 +361,7 @@ def _page_metadata(page, description):
                    page.tags['YResolution'].value[1]
     assert x_resolution == y_resolution, \
         'x-resolution and y-resolution are not equal'
-    size = page.tags['ImageWidth'].value / x_resolution * 1e4
+    size = page.tags['ImageWidth'].value / x_resolution * _MICRONS_PER_CM
     date = datetime.datetime.strptime(
         page.tags['DateTime'].value, _DATETIME_FORMAT)
 
