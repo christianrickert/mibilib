@@ -138,6 +138,8 @@ def write(filename, image, sed=None, optical=None, ranges=None,
     if ranges is None:
         ranges = [(0, m) for m in to_save.max(axis=(0, 1))]
 
+    # TODO: make sure image coordinates are of type tuple, not string
+    #       this is even relevant when copying an image
     coordinates = [
         (286, '2i', 1, _micron_to_cm(image.coordinates[0])),  # x-position
         (287, '2i', 1, _micron_to_cm(image.coordinates[1])),  # y-position
@@ -375,10 +377,18 @@ def _page_metadata(page, description):
         elif key not in RESERVED_MIBITIFF_ATTRIBUTES:
             metadata[key] = val
 
-    metadata.update({
-        'coordinates': (
+    # Do not overwrite existing `mibi.coordinates` tag with values calculated from
+    # XPosition or YPosition tags - these are specified as unsigned values:
+    # any negative positional values reported in the MIBIscope Digitizer Bin File
+    # should be converted to zeros while the `mibi.coordinates` are unsigned values.
+    # See: https://www.awaresystems.be/imaging/tiff/tifftags/yposition.html
+    if not metadata['coordinates']:
+        metadata.update({
+            'coordinates': (
             _cm_to_micron(page.tags['XPosition'].value),
             _cm_to_micron(page.tags['YPosition'].value)),
+            })
+    metadata.update({
         'date': date,
         'size': size})
 

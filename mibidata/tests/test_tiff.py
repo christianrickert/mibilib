@@ -512,9 +512,10 @@ class TestWriteReadTiff(unittest.TestCase):
         self.assertNotEqual(in_file, out_file)  # don't overwrite input
         in_image = tiff.read(in_file)
         in_mean = np.mean(in_image.data)
-        in_image.data *= NRM
+        out_image = in_image.copy()
+        out_image.data *= NRM
         out_mean = np.mean(in_image.data)
-        out_image = tiff.write(out_file, in_image)
+        tiff.write(out_file, in_image)
         self.assertEqual(tiff.info(in_file), tiff.info(out_file),
                          "Metadata is not identical after normalization.")
         self.assertNotEqual(format(in_mean, '.3f'), format(out_mean, '.3f'),
