@@ -138,11 +138,16 @@ def write(filename, image, sed=None, optical=None, ranges=None,
     if ranges is None:
         ranges = [(0, m) for m in to_save.max(axis=(0, 1))]
 
-    # TODO: make sure image coordinates are of type tuple, not string
-    #       this is even relevant when copying an image
-    coordinates = [
-        (286, '2i', 1, _micron_to_cm(image.coordinates[0])),  # x-position
-        (287, '2i', 1, _micron_to_cm(image.coordinates[1])),  # y-position
+    # Get `XPosition` and `YPosition` TIFF tags from image coordinates.
+    # Enforce unsigned numbers to comply with the TIFF specification:
+    # See comments in `_page_metadata` function.
+    coordinates = list(image.coordinates)
+    for index, coordinate in enumerate(coordinates):
+        if coordinate < 0:
+            coordinates[index] = 0.0
+    xy_positions = [
+        (286, '2i', 1, _micron_to_cm(coordinates[0])),  # x-position
+        (287, '2i', 1, _micron_to_cm(coordinates[1])),  # y-position
     ]
     resolution = (image.data.shape[0] * _MICRONS_PER_CM / float(image.size),
                   image.data.shape[1] * _MICRONS_PER_CM / float(image.size),
@@ -181,7 +186,7 @@ def write(filename, image, sed=None, optical=None, ranges=None,
                 page_name = (285, 's', 0, page_name_string)
                 min_value = (340, range_dtype, 1, ranges[i][0])
                 max_value = (341, range_dtype, 1, ranges[i][1])
-                page_tags = coordinates + [page_name, min_value, max_value]
+                page_tags = xy_positions + [page_name, min_value, max_value]
 
                 # Adding rowsperstrip parameter to prevent using the
                 # auto-calculated value. The auto-calculated value results in
@@ -199,7 +204,7 @@ def write(filename, image, sed=None, optical=None, ranges=None,
                                   'CENTIMETER')
 
                 page_name = (285, 's', 0, 'SED')
-                page_tags = coordinates + [page_name]
+                page_tags = xy_positions + [page_name]
                 infile.write(
                     sed, compression=8, resolution=sed_resolution,
                     extratags=page_tags, metadata={'image.type': 'SED'},
@@ -234,7 +239,7 @@ def write(filename, image, sed=None, optical=None, ranges=None,
             page_name = (285, 's', 0, page_name_string)
             min_value = (340, range_dtype, 1, ranges[i][0])
             max_value = (341, range_dtype, 1, ranges[i][1])
-            page_tags = coordinates + [page_name, min_value, max_value]
+            page_tags = xy_positions + [page_name, min_value, max_value]
 
             target_filename = os.path.join(
                 filename, f'{util.format_for_filename(image.targets[i])}.tiff')
@@ -379,15 +384,26 @@ def _page_metadata(page, description):
 
     # Do not overwrite existing `mibi.coordinates` tag with values calculated from
     # XPosition or YPosition tags - these are specified as unsigned values:
-    # any negative positional values reported in the MIBIscope Digitizer Bin File
+    # Any negative positional values reported in the MIBIscope Digitizer Bin File
     # should be converted to zeros while the `mibi.coordinates` are unsigned values.
     # See: https://www.awaresystems.be/imaging/tiff/tifftags/yposition.html
-    if not metadata['coordinates']:
-        metadata.update({
-            'coordinates': (
-            _cm_to_micron(page.tags['XPosition'].value),
-            _cm_to_micron(page.tags['YPosition'].value)),
-            })
+    try:
+        coordinates = metadata['coordinates']
+        # Deriving coordinates from XPosition and YPostion tags in case the tuple
+        # is not defined yet. The dictonary call with the corresponding key makes
+        # sure that the variable is required (later metadata style)
+        if not coordinates:
+            coordinates = [_cm_to_micron(page.tags['XPosition'].value),
+                           _cm_to_micron(page.tags['YPosition'].value)]
+        # The `MibiImage` class does not retain all original TIFF tags, i.e. XPosition
+        # and YPosition are calculated from the `coordinates` attribute instead.
+        # Enforcing TIFF specification compliance in the `tiff.write` function.
+        elif isinstance(coordinates, str):
+            coordinates = coordinates.strip("[]").split(",") # "[x,y]"
+            coordinates = [float(c) for c in coordinates]
+        metadata.update({'coordinates': tuple(coordinates)})
+    except KeyError:
+        pass  # key does not exist in old metadata
     metadata.update({
         'date': date,
         'size': size})

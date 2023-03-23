@@ -312,12 +312,13 @@ class TestWriteReadTiff(unittest.TestCase):
             'date': datetime.datetime.strptime(expected['date'],
                                                '%Y-%m-%dT%H:%M:%S'),
         })
+        del expected['coordinates']
         del expected['description']
-        del expected['version']
         del expected['imaging_preset']
         del expected['json']
         del expected['lens1_voltage']
         del expected['section']
+        del expected['version']
         self.assertEqual(metadata, expected)
 
     def test_convert_from_previous(self):
@@ -514,7 +515,7 @@ class TestWriteReadTiff(unittest.TestCase):
         in_mean = np.mean(in_image.data)
         out_image = in_image.copy()
         out_image.data *= NRM
-        out_mean = np.mean(in_image.data)
+        out_mean = np.mean(out_image.data)
         tiff.write(out_file, in_image)
         self.assertEqual(tiff.info(in_file), tiff.info(out_file),
                          "Metadata is not identical after normalization.")
