@@ -4,10 +4,14 @@ Copyright (C) 2021 Ionpath, Inc.  All rights reserved."""
 
 import datetime
 import os
+import platform
 import shutil
+import subprocess
 import tempfile
 import unittest
+import urllib
 import warnings
+import zipfile
 
 import numpy as np
 from skimage import io as skio, img_as_ubyte, transform
@@ -480,26 +484,33 @@ class TestWriteReadTiff(unittest.TestCase):
         big_float_image = mi.MibiImage(data, CHANNELS_NON_ASCII, **METADATA)
         tiff.write(
             self.filename, big_float_image, multichannel=True, dtype=np.float32)
-        bftools_url = ('https://downloads.openmicroscopy.org/bio-formats/'
-                       '6.12.0/artifacts/bftools.zip')
-        bftools_zip = os.path.basename(bftools_url)
-        # Very creative use of Linux-specific command line tools for integration testing:
-        # However, you can install MSYS2 on Windows to provide the necessary binaries -
-        # see: https://www.msys2.org
-        self.assertEqual(os.system(f'wget {bftools_url}'), 0)
-        self.assertEqual(os.system(f'unzip {bftools_zip}'), 0)
-        self.assertEqual(os.system(f'rm {bftools_zip}'), 0)
         # Get the absolute, OS-dependent path to the conversion tool:
         # Make sure to protect the path with escaped quotation marks before use
-        bftools_path = os.path.abspath(os.path.join("bftools", "bfconvert"))
-        print(bftools_path)
+        bftools_root = os.path.abspath(os.path.join("bftools"))
+        bftools_path = os.path.join(bftools_root, "bfconvert")
+        if platform.system() == "Windows":
+            bftools_path = os.path.abspath(str(bftools_path) + ".bat")
+        if not os.path.exists(bftools_path):
+            bftools_url = ('https://downloads.openmicroscopy.org/bio-formats/'
+                           '6.12.0/artifacts/bftools.zip')
+            bftools_zip = os.path.basename(bftools_url)
+            if not os.path.exists(bftools_zip) or \
+               not zipfile.is_zipfile(bftools_zip):           
+                urllib.request.urlretrieve(bftools_url,
+                                           filename=bftools_zip)
+                urllib.request.urlcleanup()
+            with zipfile.ZipFile(bftools_zip) as bftzip:
+                bftzip.extractall(bftools_root)
+            self.assertEqual(os.system(f'unzip {bftools_zip}'), 0)
         # Using a convert script here since it doesn't need GUI and
         # still errors out if the MIBItiff cannot be read using the
         # bioformats plugin.
-        self.assertEqual(os.system(
-            f'\"{bftools_path}\" {self.filename} converted.tiff'), 0)
-        self.assertEqual(os.system('rm -rf bftools'), 0)
-        self.assertEqual(os.system(f'rm {self.filename} converted.tiff'), 0)
+        subprocess.run([str(bftools_path),
+                        os.path.abspath(os.path.join(
+                            "mibidata", "tests", "data", "[FOV1-1] MoQC-100.tif")),
+                        str(os.path.join(bftools_root,   "[FOV1-1] MoQC-100.tif"))],
+                        check=True)
+        shutil.rmtree(bftools_root)
 
     def test_read_normalize_write(self):
         """Read a multichannel TIFF file, multiply its pixel values by a given factor, and
