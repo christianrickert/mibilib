@@ -7,6 +7,16 @@ with MIBItiff images.
 
 https://ionpath.github.io/mibilib/
 
+`mibilib` has been updated for compatibility with `MIBIscope/mibin-commercial` MIBItiff images.  
+In particular, custom [HIMSR](https://medschool.cuanschutz.edu/immunology-immunotherapy/himsr) tags have been added to the existing `ImageDescription` TIFF tag:
+* `himsr.author`: [@christianrickert](https://www.linkedin.com/in/christianrickert)
+* `himsr.back`: level of background correction (gold slide interference)
+* `himsr.bloom`: level of bloom correction (horizontal stripes)
+* `himsr.creation`: timestamp at time of MIBItiff creation
+* `himsr.mph`: median pulse height for normalization
+* `himsr.software`: "mibin-commercial, v.0.9.0"
+* `himsr.window`: mass window for target
+
 ## Setup
 
 ### Install Miniconda
