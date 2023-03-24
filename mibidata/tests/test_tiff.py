@@ -478,38 +478,34 @@ class TestWriteReadTiff(unittest.TestCase):
         self.assertEqual(image.data.dtype, np.uint16)
 
     def test_bioformats(self):
-        n = 1024
-        data = np.random.randint(
-            0, 255, (n, n, len(CHANNELS_NON_ASCII))).astype(float)
-        big_float_image = mi.MibiImage(data, CHANNELS_NON_ASCII, **METADATA)
-        tiff.write(
-            self.filename, big_float_image, multichannel=True, dtype=np.float32)
-        # Get the absolute, OS-dependent path to the conversion tool:
-        # Make sure to protect the path with escaped quotation marks before use
+        """Convert a MIBITIFF with the Bio-Tools conversion tool.
+           The test passes, when the conversion tool returned successfully
+           and the converted file exists in the Bio-Tools conversion folder.
+           """
         bftools_root = os.path.abspath(os.path.join("bftools"))
         bftools_path = os.path.join(bftools_root, "bfconvert")
         if platform.system() == "Windows":
             bftools_path = os.path.abspath(str(bftools_path) + ".bat")
-        if not os.path.exists(bftools_path):
+        if not os.path.exists(bftools_path):  # extract from zip archive
             bftools_url = ('https://downloads.openmicroscopy.org/bio-formats/'
                            '6.12.0/artifacts/bftools.zip')
             bftools_zip = os.path.basename(bftools_url)
             if not os.path.exists(bftools_zip) or \
-               not zipfile.is_zipfile(bftools_zip):           
+               not zipfile.is_zipfile(bftools_zip):  # download the zip archive
                 urllib.request.urlretrieve(bftools_url,
                                            filename=bftools_zip)
                 urllib.request.urlcleanup()
             with zipfile.ZipFile(bftools_zip) as bftzip:
                 bftzip.extractall(bftools_root)
-            self.assertEqual(os.system(f'unzip {bftools_zip}'), 0)
-        # Using a convert script here since it doesn't need GUI and
-        # still errors out if the MIBItiff cannot be read using the
-        # bioformats plugin.
+        in_file = os.path.abspath(os.path.join(
+                        "mibidata", "tests", "data", "[FOV1-1] MoQC-100.tif"))
+        out_file = str(os.path.join(bftools_root,    "[FOV1-1] MoQC-100.tif"))
+        assertEqual(os.path.getsize(in_file) > 0, True)
         subprocess.run([str(bftools_path),
-                        os.path.abspath(os.path.join(
-                            "mibidata", "tests", "data", "[FOV1-1] MoQC-100.tif")),
-                        str(os.path.join(bftools_root,   "[FOV1-1] MoQC-100.tif"))],
+                        in_file,
+                        out_file],
                         check=True)
+        assertEqual(os.path.getsize(out_file) > 0, True)
         shutil.rmtree(bftools_root)
 
     def test_read_normalize_write(self):
