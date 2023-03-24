@@ -482,37 +482,39 @@ class TestWriteReadTiff(unittest.TestCase):
            The test passes, when the conversion tool returned successfully
            and the converted file exists in the Bio-Tools conversion folder.
            """
-        bftools_root = os.path.abspath(os.path.join("bftools"))
-        bftools_path = os.path.join(bftools_root, "bfconvert")
+        self.assertEqual(os.path.getsize(HIMSR_TIFF_FILE) > 0, True)
+        bftools_root = os.path.join(os.path.dirname(__file__), "data")
+        bftools_dir = os.path.join(bftools_root, "bftools")
+        bftools_cmd = os.path.join(bftools_dir, "bfconvert")
         if platform.system() == "Windows":
-            bftools_path = os.path.abspath(str(bftools_path) + ".bat")
-        if not os.path.exists(bftools_path):  # extract from zip archive
+            bftools_cmd = os.path.abspath(str(bftools_cmd) + ".bat")
+        if not os.path.exists(bftools_cmd):  # retrieve from public repository
             bftools_url = ('https://downloads.openmicroscopy.org/bio-formats/'
                            '6.12.0/artifacts/bftools.zip')
-            bftools_zip = os.path.basename(bftools_url)
+            bftools_zip = os.path.join(bftools_root, os.path.basename(bftools_url))
             if not os.path.exists(bftools_zip) or \
-               not zipfile.is_zipfile(bftools_zip):  # download the zip archive
+               not zipfile.is_zipfile(bftools_zip):  # download zip archive
                 urllib.request.urlretrieve(bftools_url,
                                            filename=bftools_zip)
                 urllib.request.urlcleanup()
-            with zipfile.ZipFile(bftools_zip) as bftzip:
+            with zipfile.ZipFile(bftools_zip) as bftzip:  # unzip archive
                 bftzip.extractall(bftools_root)
-        in_file = os.path.abspath(os.path.join(
-                        "mibidata", "tests", "data", "[FOV1-1] MoQC-100.tif"))
-        out_file = str(os.path.join(bftools_root,    "[FOV1-1] MoQC-100.tif"))
-        assertEqual(os.path.getsize(in_file) > 0, True)
-        subprocess.run([str(bftools_path),
-                        in_file,
-                        out_file],
+        out_file = str(os.path.join(bftools_root,
+                                    "bftools",
+                                    "[FOV1-1] MoQC-100.tif"))
+        subprocess.run([str(bftools_cmd),
+                        str(HIMSR_TIFF_FILE),
+                        str(out_file)],
                         check=True)
-        assertEqual(os.path.getsize(out_file) > 0, True)
-        shutil.rmtree(bftools_root)
+        self.assertEqual(os.path.getsize(out_file) > 0, True)
+        shutil.rmtree(bftools_dir)
 
     def test_read_normalize_write(self):
         """Read a multichannel TIFF file, multiply its pixel values by a given factor, and
            write a multichannel TIFF file with identical metadata but updated pixel values.
            Test will fail when the metadata changes or when the data is not normalized.
            """
+        self.assertEqual(os.path.getsize(HIMSR_TIFF_FILE) > 0, True)
         NRM = 0.1234
         in_file = HIMSR_TIFF_FILE
         out_ext = os.path.splitext(in_file)
