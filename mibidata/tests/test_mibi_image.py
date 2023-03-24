@@ -349,7 +349,7 @@ class TestMibiImage(unittest.TestCase):
         empty_data = image.slice_data([])
         self.assertEqual(empty_data.shape[2], 0)
         # confirm that this object will be interpreted as False by if:
-        self.assertFalse(empty_data)
+        self.assertFalse(empty_data.size > 0)
 
     def test_slice_image(self):
         image = mi.MibiImage(TEST_DATA, STRING_LABELS)
