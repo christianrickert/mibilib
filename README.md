@@ -22,10 +22,45 @@ conda activate mibilib
 ```
 
 ## Usage
-To use the MIBItracker API, you will need to use the backend url listed in the
+It's easy to work with MIBITIFFs using the `mibidata` module.
+```Python3
+from mibidata import tiff
+
+# extract metadata from mibitiff (fast)
+metadata = tiff.info("mibi.tif")  # returns a dictionary
+
+# print FoV name from metadata
+print(metadata["fov_name"])
+
+# read a mibitiff into a MibiImage class instance (slow)
+mibitiff = tiff.read("mibi.tif")
+
+# print channel tuples from mibitiff
+print(mibitiff.channels)
+
+# copy MibiImage class into a new instance
+newtiff = mibitiff.copy()
+
+# rename a target channel
+OLD_TARGET = "dsDNA"
+NEW_TARGET = "dsDNA (nuclear marker)"
+newtiff.rename_targets({OLD_TARGET: NEW_TARGET})
+
+# offset pixel data of all channels
+newtiff.data += 2.0
+
+# multiply data of second channel only
+CHANNEL = 1
+newtiff.data[:, :, CHANNEL] *= 1.2
+
+# write MibiImage class into a file
+tiff.write("new.tiff", newtiff)
+```
+
+To use the MIBItracker API with `mibitracker`, you will need to use the backend url listed in the
 About page. This can be accessed after you have logged in from the menu
 under your username in the upper right of the window.
-```python
+```Python3
 from mibitracker.request_helpers import MibiRequests
 
 request = MibiRequests(
