@@ -1,5 +1,3 @@
-[![CircleCI](https://circleci.com/gh/ionpath/mibilib.svg?style=svg&circle-token=e798611a4abf9f2503a532c8ad5fd02d849d85a0)](https://circleci.com/gh/ionpath/mibilib)
-
 # mibilib
 
 Python client for IONpath MIBItracker API, plus utility functions for working
