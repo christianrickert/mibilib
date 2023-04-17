@@ -381,6 +381,11 @@ def _page_metadata(page, description):
             metadata[key[5:]] = val
         elif key not in RESERVED_MIBITIFF_ATTRIBUTES:
             metadata[key] = val
+        # these variables are quietly dropped:
+        #   image.type
+        #   channel.mass
+        #   channel.target
+        #   shape
 
     # Do not overwrite existing `mibi.coordinates` tag with values calculated from
     # XPosition or YPosition tags - these are specified as unsigned values:
