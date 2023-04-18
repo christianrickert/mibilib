@@ -15,6 +15,11 @@ In particular, custom [HIMSR](https://medschool.cuanschutz.edu/immunology-immuno
 * `himsr.software`: "mibin-commercial, v.0.9.0"
 * `himsr.window`: mass window for target
 
+Optional tags can be added to the metadata:
+* `mibi.norm`: normalization factor
+
+Prefix optional tags with `mibi.` for compatibility with Bio-Formats.
+
 ## Setup
 
 ### Install Miniconda
@@ -54,12 +59,17 @@ OLD_TARGET = "dsDNA"
 NEW_TARGET = "dsDNA (nuclear marker)"
 newtiff.rename_targets({OLD_TARGET: NEW_TARGET})
 
-# offset pixel data of all channels
-newtiff.data += 2.0
+# normalize pixel data of all channels
+NRM = 1.23
+newtiff.data *= NRM
 
-# multiply data of second channel only
+# offset data of second channel only
 CHANNEL = 1
-newtiff.data[:, :, CHANNEL] *= 1.2
+newtiff.data[:, :, CHANNEL] += 3.0
+
+# add custom tags with a dictionary
+TAGS = {"mibi.norm": NRM}
+newtiff.add_attr(**TAGS)
 
 # write MibiImage class into a file
 tiff.write("new.tiff", newtiff)
