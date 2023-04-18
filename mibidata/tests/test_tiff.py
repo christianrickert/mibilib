@@ -41,7 +41,12 @@ METADATA = {
     'time_resolution': 0.5, 'miscalibrated': False, 'check_reg': False,
     'filename': '20180703_1234_test', 'description': 'test image',
     'version': 'alpha', 'imaging_preset': 'Fine', 'json': '{\"4\":5,\"6\":7}',
-    'lens1_voltage': '21345.6', 'section': 4
+    'lens1_voltage': '21345.6', 'section': 4, 'himsr.author':
+    'Christian Rickert (HIMSR, CU Denver)', 'himsr.back': 'medium',
+    'himsr.bloom': 'medium', 'himsr.creation':\
+    '2023-04-18 00:00:00.000000000 UTC', 'himsr.mph': 12345,
+    'himsr.software': 'mibin-commercial, v0.9.0',
+    'himsr.window': '[88.7 (7213), 89.3 (7255)]'
 }
 USER_DEFINED_METADATA = {'x_size': 500., 'y_size': 500., 'mass_range': 20}
 OLD_METADATA = {
@@ -287,8 +292,12 @@ class TestWriteReadTiff(unittest.TestCase):
             'conjugates': list(CHANNELS),
             'date': datetime.datetime.strptime(expected['date'],
                                                '%Y-%m-%dT%H:%M:%S'),
-            'description': None, 'version': None, 'imaging_preset': None, 'json': None,
-            'lens1_voltage': None, 'section': None})
+            'description': None, 'version': None, 'imaging_preset': None,
+            'json': None, 'lens1_voltage': None, 'section': None,
+            'himsr.author': None, 'himsr.back': None, 'himsr.bloom': None,
+            'himsr.creation': None, 'himsr.mph': None, 'himsr.window': None,
+            'himsr.software': None, 'himsr.window': None
+            })
         self.assertEqual(metadata, expected)
 
     def test_read_old_mibiscope_metadata(self):
@@ -303,7 +312,15 @@ class TestWriteReadTiff(unittest.TestCase):
             'imaging_preset': None,
             'json': None,
             'lens1_voltage': None,
-            'section': None
+            'section': None,
+            'himsr.author': None,
+            'himsr.back': None,
+            'himsr.bloom': None,
+            'himsr.creation': None,
+            'himsr.mph': None,
+            'himsr.window': None,
+            'himsr.software': None,
+            'himsr.window': None
         })
         self.assertEqual(metadata, expected)
 
@@ -323,6 +340,8 @@ class TestWriteReadTiff(unittest.TestCase):
         del expected['lens1_voltage']
         del expected['section']
         del expected['version']
+        for key in mi.HIMSR_METADATA_ATTRIBUTES:
+            del expected[key]
         self.assertEqual(metadata, expected)
 
     def test_convert_from_previous(self):
@@ -525,7 +544,7 @@ class TestWriteReadTiff(unittest.TestCase):
         out_image = in_image.copy()
         out_image.data *= NRM
         out_mean = np.mean(out_image.data)
-        tiff.write(out_file, in_image)
+        tiff.write(out_file, out_image)
         self.assertEqual(tiff.info(in_file), tiff.info(out_file),
                          "Metadata is not identical after normalization.")
         self.assertNotEqual(format(in_mean, '.3f'), format(out_mean, '.3f'),

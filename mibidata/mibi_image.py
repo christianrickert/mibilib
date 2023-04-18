@@ -188,6 +188,9 @@ class MibiImage():
         for attr in SPECIFIED_METADATA_ATTRIBUTES[1:]:
             setattr(self, attr, kwargs.pop(attr, None))
 
+        for attr in HIMSR_METADATA_ATTRIBUTES:
+            setattr(self, attr, kwargs.pop(attr, None))
+
         # empty list for storing user-defined attribute names
         self._user_defined_attributes = []
 
@@ -450,6 +453,8 @@ class MibiImage():
     def metadata(self):
         """Returns a dictionary of the image's metadata."""
         metadata_keys = list(SPECIFIED_METADATA_ATTRIBUTES)
+        # add HIMSR metadata attributes
+        metadata_keys.extend(HIMSR_METADATA_ATTRIBUTES)
         # find user-defined metadata
         metadata_keys.extend(self._user_defined_attributes)
         return {key: getattr(self, key) for key in metadata_keys}
