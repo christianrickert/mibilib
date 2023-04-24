@@ -370,9 +370,9 @@ class MibiImage():
             # Tuples of masses and targets.
             masses, targets = zip(*channels)
             if len(set(masses)) != length:
-                raise ValueError('Masses are not all unique.')
+                warnings.warn('Masses are not all unique.')
             if len(set(targets)) != length:
-                raise ValueError('Targets are not all unique.')
+                warnings.warn('Targets are not all unique.')
             self.masses = masses
             self.targets = targets
         elif all(isinstance(c, str) for c in channels):
