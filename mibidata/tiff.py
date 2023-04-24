@@ -170,7 +170,7 @@ def write(filename, image, sed=None, optical=None, ranges=None,
 
     if multichannel:
         targets = list(image.targets)
-        util.sort_channel_names(targets)
+        # util.sort_channel_names(targets)
         indices = image.channel_inds(targets)
         with TiffWriter(filename) as infile:
             for i in indices:
