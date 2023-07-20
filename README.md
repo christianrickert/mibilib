@@ -82,7 +82,7 @@ under your username in the upper right of the window.
 from mibitracker.request_helpers import MibiRequests
 
 request = MibiRequests(
-    'https://your-mibitracker-backend.appspot.com',
+    'https://[sitename].api.ionpath.com',
     'user@example.com',
     'password1234'
 )
