@@ -52,6 +52,9 @@ _IOX_APERTURE_MAP = {
     '500um': APERTURE_500UM,
 }
 
+# repeat user warnings (per-file)
+warnings.simplefilter('always', UserWarning)
+
 class MibiImage():
     """A multiplexed image with labeled channels and metadata.
 
