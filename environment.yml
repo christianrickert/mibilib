@@ -7,6 +7,7 @@ dependencies:
 - python=3.11.*
 - pip
 - git # mibilib donwload and deployment
+- imagecodecs  # file compression
 - matplotlib
 - numpy
 - pandas
