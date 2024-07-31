@@ -1,3 +1,5 @@
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/christianrickert/mibilib/master?label=fork%20update) ![GitHub Release Date](https://img.shields.io/github/release-date/ionpath/mibilib?label=upstream%20release)
+
 # mibilib
 
 Python client for IONpath MIBItracker API, plus utility functions for working
